@@ -1,6 +1,7 @@
 const router = require("express").Router();
 router.get("/:id", (req, res) => {
   console.log(req.params.id);
+  
   res.json({
     data: `Hello how are you  ${
       req?.params?.id
