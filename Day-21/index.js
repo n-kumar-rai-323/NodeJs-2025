@@ -8,6 +8,12 @@ const indexRouter = require("./Routers");
 app.use(express.json());
 app.use("/", indexRouter);
 
+
+app.use((err, req, res, next)=>{
+  const errMsg = err? err.toString() : "Something went wrong"
+  res.status(500).json({data:"", msg:errMsg});
+})
+
 app.listen(PORT, () => {
   console.log(`Application is Running ${PORT}`);
 });
