@@ -33,7 +33,7 @@ router.get("/", (req, res) => {
 
 
 
-router.post("/register", upload.single("profilePic"), (req, res, next) => {
+router.post("/profile", upload.single("profilePic"), (req, res, next) => {
     try {
         console.log({ pic: req.file });
         const URL = "http://localhost:6900/resources/uploads/";
