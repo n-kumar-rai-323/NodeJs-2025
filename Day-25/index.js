@@ -14,7 +14,8 @@ mongoose
   .catch((e) => {
     console.log("database error");
   });
-app.use(express.json())
+app.use(express.json());
+app.use("/", express.static("public"));
 app.use("/", indexRoute);
 
 app.listen(PORT, () => {
