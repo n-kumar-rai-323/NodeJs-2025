@@ -17,21 +17,21 @@ const getById = async (roomnumber) => {
 };
 
 // update by id
-const updateById = async (id, payload) => {
-  return Model.updateOne({ _id: id }, payload);
+const updateById = async (roomNumber, payload) => {
+  return Model.updateOne({ number: roomNumber }, payload);
 };
 
 // update room
-const updateStatus = async (id) => {
-  const room = await Model.findOne({ _id: id });
+const updateStatus = async (roomNumber) => {
+  const room = await Model.findOne({ number: roomNumber });
   if (!room) throw new Error("Room not found!");
   const { isFilled } = room;
-  return Model.updateOne({ _id: id }, { isFilled: !isFilled });
+  return Model.updateOne({ number: roomNumber }, { isFilled: !isFilled });
 };
 
 // delete
-const remove = async (id) => {
-  return Model.deleteOne({ _id: id });
+const remove = async (roomNum) => {
+  return Model.deleteOne({ number: roomNum });
 };
 
 module.exports = { create, list, getById, updateById, updateStatus, remove };

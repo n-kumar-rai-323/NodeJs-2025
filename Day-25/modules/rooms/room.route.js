@@ -34,7 +34,7 @@ router.post("/", async (req, res, next) => {
 //update
 router.put("/:id", async (req, res, next) => {
   try {
-    const result = await roomController.updateById(req?.params?.id);
+    const result = await roomController.updateById(req?.params?.id, req.body);
     res.json({ data: result, msg: "Room updated successfully" });
   } catch (e) {
     next(e);
@@ -52,7 +52,7 @@ router.patch("/:id", async (req, res, next) => {
 });
 //delete
 
-router.patch("/:id", async (req, res, next) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     const result = await roomController.remove(req?.params?.id);
     res.json({ data: result, msg: "Room delete successfully" });
