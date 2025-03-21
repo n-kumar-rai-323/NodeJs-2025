@@ -41,4 +41,13 @@ router.post(
     }
   }
 );
+
+router.post("/login", async (req, res, next) => {
+  try {
+    const result = await userController.login(req.body);
+    res.json({ data: result, msg: "User logged in successfully" });
+  } catch (e) {
+    next(e);
+  }
+});
 module.exports = router;

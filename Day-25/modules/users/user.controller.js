@@ -1,5 +1,6 @@
 const userModel = require("./user.model");
 const { genHas, verifyHash } = require("../../utils/secure");
+const { genToken } = require("../../utils/token");
 
 const create = async (payload) => {
   const { password, isActive, ...rest } = payload;
@@ -14,4 +15,18 @@ const register = async (payload) => {
   return userModel.create(rest);
 };
 
-module.exports = { create, register };
+const login = async (payload) => {
+  const { email, password } = payload;
+  const user = await userModel.findOne({ email, isActive: true });
+  if (!user) throw new Error("User not found");
+  const isValidPw = verifyHash(password, user?.password);
+  if (!isValidPw) throw new Error("Email or Password didn't match");
+  const signData = {
+    name: user?.name,
+    email: user?.email,
+    roles: user?.roles,
+  };
+  return genToken(signData);
+};
+
+module.exports = { create, register, login };
