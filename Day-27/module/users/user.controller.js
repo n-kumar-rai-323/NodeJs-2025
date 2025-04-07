@@ -24,21 +24,27 @@ const register = async (payload) => {
 
 const genEmailToken = async ({ to, subject, msg }) => {
   const { messageId } = await sendEmail({ to, subject, htmlMessage: msg });
-  return messageId ? true : false;
+  if (!messageId) {
+    console.error("Failed to send email", { to, subject, msg });
+    return false;
+  }
+  return true;
 };
 
 const verifyEmailTOken = async (payload) => {
   const { email, token } = payload;
-  const user = await Model.findOne({ email: email, isBlocked: false });
+  const user = await Model.findOne({ email, isBlocked: false });
+
   if (!user) throw new Error("User not found");
 
-  const isValidToken = token === user?.token;
+  // Ensure user.token is valid
+  if (!user.token) throw new Error("Token is missing in the user document");
+
+  const isValidToken = token === user.token;
   if (!isValidToken) throw new Error("Invalid token");
 
-  const updatedUser = await Model.updateOne(
-    { email },
-    { isActive: true, token: "" }
-  );
+  await Model.updateOne({ email }, { isActive: true, token: "" });
+  return { data: null, msg: "Email verified successfully" };
 };
 
 const login = async (payload) => {
@@ -124,6 +130,35 @@ const changePassword = async ({ email, oldPassword, newPassword }) => {
   return { data: null, msg: "Password Changed Successfully" };
 };
 
+const resetPassword = async ({ email, newPassword }) => {
+  console.log("Reset Password Request:", { email, newPassword });
+
+  if (!email || !newPassword) {
+    throw new Error("Email and new password are required");
+  }
+
+  const user = await Model.findOne({ email, isActive: true, isBlocked: false });
+  if (!user) throw new Error("User not found");
+
+  const password = await genHash(newPassword); // Awaiting async password hashing
+  if (!password) throw new Error("Password hashing failed");
+
+  const updateUser = await Model.findOneAndUpdate(
+    { email },
+    { password },
+    { new: true }
+  );
+
+  if (!updateUser) throw new Error("Password reset failed");
+
+  return { data: null, msg: "Password Reset Successfully" };
+};
+
+const blockUser = async ({ email }) => {
+  const user = await Model.findOne({ email, isActive: true });
+  if (!user) throw new Error("User not found");
+};
+
 module.exports = {
   register,
   verifyEmailTOken,
@@ -131,4 +166,5 @@ module.exports = {
   genForgatePasswordToken,
   verifyForgatePasswordToken,
   changePassword,
+  resetPassword,
 };

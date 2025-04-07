@@ -64,4 +64,24 @@ router.put("/change-password", async (req, res, next) => {
     next(e);
   }
 });
+router.put("/reset-password", async (req, res, next) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    // Log to check if the body is being received correctly
+    console.log("Request Body:", req.body);
+
+    if (!email || !newPassword) {
+      return res
+        .status(400)
+        .json({ msg: "Email and new password are required" });
+    }
+
+    const result = await Controller.resetPassword(req.body);
+    res.json(result);
+  } catch (e) {
+    next(e);
+  }
+});
+
 module.exports = router;
