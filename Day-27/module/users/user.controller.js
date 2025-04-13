@@ -130,7 +130,7 @@ const changePassword = async ({ email, oldPassword, newPassword }) => {
   return { data: null, msg: "Password Changed Successfully" };
 };
 
-const resetPassword = async ({ email, newPassword }) => {
+const resetPassword = async ({ email, newPassword, updated_by }) => {
   console.log("Reset Password Request:", { email, newPassword });
 
   if (!email || !newPassword) {
@@ -145,7 +145,7 @@ const resetPassword = async ({ email, newPassword }) => {
 
   const updateUser = await Model.findOneAndUpdate(
     { email },
-    { password },
+    { password, updated_by },
     { new: true }
   );
 
@@ -154,9 +154,21 @@ const resetPassword = async ({ email, newPassword }) => {
   return { data: null, msg: "Password Reset Successfully" };
 };
 
-const blockUser = async ({ email }) => {
+const blockUser = async ({ email, updated_by }) => {
   const user = await Model.findOne({ email, isActive: true });
   if (!user) throw new Error("User not found");
+  const updatedUser = await Model.findOneAndUpdate(
+    { email },
+    { isBlocked: !user?.isBlocked, updated_by },
+    { new: true }
+  );
+  if (!updatedUser) throw new Error("User Block faild");
+  return {
+    data: { isBlocked: updatedUser?.isBlocked },
+    msg: `User ${
+      updatedUser?.isBlocked ? "blocked" : "unblocked"
+    } Successfully`,
+  };
 };
 
 module.exports = {
@@ -167,4 +179,5 @@ module.exports = {
   verifyForgatePasswordToken,
   changePassword,
   resetPassword,
+  blockUser,
 };

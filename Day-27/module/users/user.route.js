@@ -1,6 +1,7 @@
 const multer = require("multer");
 const router = require("express").Router();
 const Controller = require("./user.controller");
+const { secureAPI } = require("../../utils/secure.js");
 const { validate, forgatePasswordValidation } = require("./user.validation");
 
 const storage = multer.diskStorage({
@@ -64,13 +65,12 @@ router.put("/change-password", async (req, res, next) => {
     next(e);
   }
 });
-router.put("/reset-password", async (req, res, next) => {
+router.put("/reset-password", secureAPI(["admin"]), async (req, res, next) => {
   try {
+    console.log("i am here");
     const { email, newPassword } = req.body;
-
     // Log to check if the body is being received correctly
     console.log("Request Body:", req.body);
-
     if (!email || !newPassword) {
       return res
         .status(400)
@@ -78,6 +78,15 @@ router.put("/reset-password", async (req, res, next) => {
     }
 
     const result = await Controller.resetPassword(req.body);
+    res.json(result);
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.patch("/block", secureAPI(["admin"]), async (req, res, next) => {
+  try {
+    const result = await Controller.blockUser(req.body);
     res.json(result);
   } catch (e) {
     next(e);

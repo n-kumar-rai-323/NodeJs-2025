@@ -11,6 +11,7 @@ const schema = new Schema(
     phone: String,
     image: String,
     token: String,
+    updated_by: String,
   },
   {
     timestamps: true,
