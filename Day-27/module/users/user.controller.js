@@ -130,6 +130,13 @@ const changePassword = async ({ email, oldPassword, newPassword }) => {
   return { data: null, msg: "Password Changed Successfully" };
 };
 
+const updateProfile = async (payload) => {
+  const { updated_by: currentUser, ...rest } = payload;
+  return await Model.findOneAndUpdate({ _id: currentUser }, rest, {
+    new: true,
+  }).select("-password");
+};
+
 const resetPassword = async ({ email, newPassword, updated_by }) => {
   console.log("Reset Password Request:", { email, newPassword });
 
@@ -170,6 +177,26 @@ const blockUser = async ({ email, updated_by }) => {
     } Successfully`,
   };
 };
+const create = async (payload) => {
+  const { password, updated_by, ...rest } = payload;
+  rest.isActive = true;
+  rest.created_by = updated_by;
+  rest.password = genHash(password);
+  const user = await Model.create(rest);
+  return Model.findOne({ email: user?.email }).select("-password");
+};
+
+const getById = (id) => {
+  return Model.findOne({ _id }).select("-password");
+};
+
+const updateById = async ({ id, payload }) => {
+  const user = await Model.findOne({ _id: id });
+  if (!user) throw new Error("user not found");
+  return await Model.findOneAndUpdate({ _id: id }, payload, {
+    new: true,
+  }).select("-password");
+};
 
 module.exports = {
   register,
@@ -180,4 +207,8 @@ module.exports = {
   changePassword,
   resetPassword,
   blockUser,
+  create,
+  getById,
+  updateById,
+  updateProfile,
 };

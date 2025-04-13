@@ -12,6 +12,7 @@ const schema = new Schema(
     image: String,
     token: String,
     updated_by: String,
+    created_by: String,
   },
   {
     timestamps: true,

@@ -93,4 +93,43 @@ router.patch("/block", secureAPI(["admin"]), async (req, res, next) => {
   }
 });
 
+router.post("/", secureAPI(["admin"]), async (req, res, next) => {
+  try {
+    const result = await Controller.create(req.body);
+    res.json({ data: result, msg: "User created successfylly" });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.put("/profile", secureAPI(["admin", "user"]), async (req, res, next) => {
+  try {
+    const result = await Controller.updateProfile(req.body);
+    res.json({ data: result, msg: "Profile updated successfully" });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.get("/:id", secureAPI(["admin"]), async (req, res, next) => {
+  try {
+    const result = await Controller.getById(req.params.id);
+    res.json({ data: result, msg: "User detail generated successfully" });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.put("./:id", secureAPI(["admin"]), async (req, res, next) => {
+  try {
+    const result = await Controller.updateById({
+      id: req.params.id,
+      payload: req.body,
+    });
+    res.json({ data: result, msg: "User data updated successfully" });
+  } catch (e) {
+    next(e);
+  }
+});
+
 module.exports = router;
